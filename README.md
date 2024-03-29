@@ -1,0 +1,1 @@
+# ps-wasm-proposal-airdrop
