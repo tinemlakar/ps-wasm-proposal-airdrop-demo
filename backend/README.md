@@ -1,1 +1,1 @@
-# Prebuild solution for Email Airdrop via Apillon API
+# Prebuild solution for wasm nft airdrop (backend)

@@ -1,4 +1,10 @@
-# Wasm airdrop prebuild solution
+# Wasm airdrop prebuild solution frontend
+
+This repository contains source code for wasm nft proposal Airdrop website.
+
+## Overview
+
+This solution consists of an admin for managing proposal voters that get an NFT airdrop.
 
 ## Stack
 
