@@ -13,9 +13,10 @@ import { SqlError } from "../lib/errors";
 import { getQueryParams, selectAndCountQuery } from "../lib/sql-utils";
 
 export enum AirdropStatus {
-  PENDING = 1,
-  AIRDROP_COMPLETED = 2,
-  AIRDROP_ERROR = 3,
+  UNCONFIRMED = 1,
+  PENDING = 2,
+  AIRDROP_COMPLETED = 3,
+  AIRDROP_ERROR = 4,
 }
 
 export class User extends BaseSqlModel {
@@ -73,9 +74,9 @@ export class User extends BaseSqlModel {
         code: ValidatorErrorCode.DATA_MODEL_INVALID_STATUS,
       },
     ],
-    defaultValue: AirdropStatus.PENDING,
+    defaultValue: AirdropStatus.UNCONFIRMED,
     fakeValue() {
-      return AirdropStatus.PENDING;
+      return AirdropStatus.UNCONFIRMED;
     },
   })
   public airdrop_status: number;
@@ -106,6 +107,28 @@ export class User extends BaseSqlModel {
     }
   }
 
+  public async confirmAll() {
+    const conn = await this.db().start();
+
+    try {
+      await conn.execute(
+        `UPDATE user SET airdrop_status = ${AirdropStatus.PENDING} WHERE
+          airdrop_status = ${AirdropStatus.UNCONFIRMED}
+        ;
+       `
+      );
+      await this.db().commit(conn);
+    } catch (err) {
+      await this.db().rollback(conn);
+      throw new SqlError(
+        err,
+        this.getContext(),
+        SystemErrorCode.DATABASE_ERROR,
+        "user/confirm"
+      );
+    }
+  }
+
   public async populateByWallet(wallet: string) {
     const data = await this.db().paramQuery(
       `
@@ -130,9 +153,10 @@ export class User extends BaseSqlModel {
       `
       SELECT 
       count(*) as total,
-        SUM(IF(airdrop_status = 1, 1, 0)) as pending,
-        SUM(IF(airdrop_status = 2, 1, 0)) as airdropped,
-        SUM(IF(airdrop_status = 3, 1, 0)) as threwError
+        SUM(IF(airdrop_status = 1, 1, 0)) as unconfirmed,
+        SUM(IF(airdrop_status = 2, 1, 0)) as pending,
+        SUM(IF(airdrop_status = 3, 1, 0)) as airdropped,
+        SUM(IF(airdrop_status = 4, 1, 0)) as threwError
     FROM user;
     `
     );

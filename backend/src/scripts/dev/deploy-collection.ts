@@ -1,5 +1,11 @@
-import { CollectionType, EvmChain, LogLevel, Nft } from '@apillon/sdk';
-import { env } from '../../config/env';
+import {
+  CollectionType,
+  EvmChain,
+  LogLevel,
+  Nft,
+  SubstrateChain,
+} from "@apillon/sdk";
+import { env } from "../../config/env";
 
 (async () => {
   const nft = new Nft({
@@ -8,23 +14,20 @@ import { env } from '../../config/env';
     logLevel: LogLevel.VERBOSE,
   });
 
-  const collection = await nft.create({
-    chain: EvmChain.MOONBASE,
+  const collection = await nft.createSubstrate({
+    chain: SubstrateChain.ASTAR,
     collectionType: CollectionType.GENERIC,
-    name: 'Drop test',
-    description: 'Specific ID drop test',
-    symbol: 'DT',
+    name: "Drop test",
+    description: "Specific ID drop test",
+    symbol: "DT",
     royaltiesFees: 0,
-    royaltiesAddress: '0x0000000000000000000000000000000000000000',
-    baseUri: 'https://test.com/metadata/',
-    baseExtension: '.json',
+    royaltiesAddress: "0x0000000000000000000000000000000000000000",
+    baseUri: "https://test.com/metadata/",
+    baseExtension: ".json",
     maxSupply: 0,
-    isRevokable: false,
-    isSoulbound: false,
-    isAutoIncrement: false, // set how you want
     drop: false,
   });
   console.log(collection.serialize());
-})().catch(async err => {
+})().catch(async (err) => {
   console.log(err);
 });

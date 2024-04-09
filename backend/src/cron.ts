@@ -1,11 +1,8 @@
 import { CronJob } from "cron";
 import { AirdropStatus } from "./models/user";
-import { dateToSqlString } from "./lib/sql-utils";
 import { SqlModelStatus } from "./models/base-sql-model";
 import { MysqlConnectionManager } from "./lib/mysql-connection-manager";
-import { SmtpSendTemplate } from "./lib/node-mailer";
 import { env } from "./config/env";
-import { generateEmailAirdropToken } from "./lib/jwt";
 import { LogType, writeLog } from "./lib/logger";
 import { LogLevel, Nft } from "@apillon/sdk";
 
@@ -31,7 +28,6 @@ export class Cron {
 
   async airdrop() {
     const mysql = await MysqlConnectionManager.getInstance();
-    const conn = await mysql.start();
 
     const collection = new Nft({
       key: env.APILLON_KEY,
@@ -40,6 +36,8 @@ export class Cron {
     }).collection(env.COLLECTION_UUID);
 
     for (let i = 0; i < 100; i++) {
+      const conn = await mysql.start();
+
       try {
         const res = await conn.execute(
           `SELECT * FROM user WHERE
@@ -53,6 +51,7 @@ export class Cron {
         const user = res[0] as any;
 
         if (!user) {
+          await conn.rollback();
           break;
         }
 
