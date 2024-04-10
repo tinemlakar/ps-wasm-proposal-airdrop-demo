@@ -3,7 +3,7 @@ import {
   Stage,
   stopServerAndCloseMySqlContext,
 } from "../helpers/context";
-import * as request from "supertest";
+import request from "supertest";
 import { setupTestDatabase, clearTestDatabase } from "../helpers/migrations";
 import { HDNodeWallet, Wallet } from "ethers";
 let stage: Stage;

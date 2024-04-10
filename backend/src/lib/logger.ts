@@ -1,4 +1,4 @@
-import * as moment from "moment";
+import moment from "moment";
 import { env } from "../config/env";
 import {
   red,

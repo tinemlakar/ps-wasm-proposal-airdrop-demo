@@ -1,4 +1,4 @@
-import { Keyring } from "@polkadot/api";
+import Keyring from "@polkadot/keyring";
 import { mnemonicGenerate } from "@polkadot/util-crypto";
 
 export async function getWallet() {

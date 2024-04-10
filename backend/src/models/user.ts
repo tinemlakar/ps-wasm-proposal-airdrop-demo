@@ -97,6 +97,7 @@ export class User extends BaseSqlModel {
       await this.insert(SerializedStrategy.DB, conn);
       await this.db().commit(conn);
     } catch (err) {
+      console.log(err);
       await this.db().rollback(conn);
       throw new SqlError(
         err,

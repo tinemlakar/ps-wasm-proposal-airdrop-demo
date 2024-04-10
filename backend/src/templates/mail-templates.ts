@@ -1,6 +1,6 @@
-import * as fs from "fs";
-import * as path from "path";
-import * as handlebars from "handlebars";
+import fs from "fs";
+import path from "path";
+import handlebars from "handlebars";
 import { LogType, writeLog } from "../lib/logger";
 
 export class MailTemplates {

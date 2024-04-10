@@ -1,5 +1,5 @@
 import { env } from "../config/env";
-import * as SqlString from "sqlstring";
+import SqlString from "sqlstring";
 import { MySql } from "./mysql";
 
 export interface SqlQueryObject {

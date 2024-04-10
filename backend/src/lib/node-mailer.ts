@@ -1,10 +1,10 @@
-import * as nodemailer from "nodemailer";
+import nodemailer from "nodemailer";
 import { env } from "../config/env";
 import { Options, MailOptions } from "nodemailer/lib/smtp-transport";
 import { MailTemplates } from "../templates/mail-templates";
 import { writeLog, LogType } from "./logger";
 import { Attachment } from "nodemailer/lib/mailer";
-import * as path from "path";
+import path from "path";
 
 /**
  * Send email via SMTP server

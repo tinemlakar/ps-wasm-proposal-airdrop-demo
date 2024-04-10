@@ -1,7 +1,7 @@
 import { env } from "../../config/env";
 import { MySql, HttpServer } from "../../index";
 import { Context } from "../../context";
-import * as express from "express";
+import express from "express";
 
 export interface Stage {
   context: Context;

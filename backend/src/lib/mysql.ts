@@ -1,9 +1,9 @@
-import * as mysql from "mysql2/promise";
+import mysql from "mysql2/promise";
 import { IEnv } from "../config/env";
 import { ProcedureError } from "./errors";
 import { writeLog, LogType } from "./logger";
 import { PoolConnection } from "mysql2/promise";
-import * as SqlString from "sqlstring";
+import SqlString from "sqlstring";
 
 /**
  * MySQL class.

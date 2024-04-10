@@ -181,6 +181,7 @@ export abstract class BaseSqlModel extends BaseModel {
         await this.db().commit(conn);
       }
     } catch (err) {
+      console.log(err);
       if (isSingleTrans) {
         await this.db().rollback(conn);
       }

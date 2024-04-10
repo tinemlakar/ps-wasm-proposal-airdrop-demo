@@ -3,7 +3,7 @@ import {
   Stage,
   stopServerAndCloseMySqlContext,
 } from "../helpers/context";
-import * as request from "supertest";
+import request from "supertest";
 import { setupTestDatabase, clearTestDatabase } from "../helpers/migrations";
 import { AirdropStatus, User } from "../../models/user";
 import { env } from "../../config/env";

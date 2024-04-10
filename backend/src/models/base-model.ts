@@ -111,13 +111,18 @@ export abstract class BaseModel extends Model<Context> {
     if (!data) {
       return super.populate(mappedObj, strategy);
     }
-    for (const key of Object.keys(this.__props)) {
-      if (data.hasOwnProperty(key)) {
-        mappedObj[key] = data[key];
-      } else if (data.hasOwnProperty(getFieldName(this, key))) {
-        mappedObj[key] = data[getFieldName(this, key)];
+
+    if (data)
+      for (const key of Object.keys(this.__props)) {
+        if (!data.hasOwnProperty) {
+          data = JSON.stringify(data);
+        }
+        if (data.hasOwnProperty(key)) {
+          mappedObj[key] = data[key];
+        } else if (data.hasOwnProperty(getFieldName(this, key))) {
+          mappedObj[key] = data[getFieldName(this, key)];
+        }
       }
-    }
     return super.populate(mappedObj, strategy);
   }
 
