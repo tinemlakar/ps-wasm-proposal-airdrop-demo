@@ -21,7 +21,7 @@ import { env } from "../../config/env";
     description: "Specific ID drop test",
     symbol: "DT",
     royaltiesFees: 0,
-    royaltiesAddress: "0x0000000000000000000000000000000000000000",
+    royaltiesAddress: "WfuyB8znWybwbkrXu5a6e4CdPPwRygyoqzByAZHBZuCgQdn",
     baseUri: "https://test.com/metadata/",
     baseExtension: ".json",
     maxSupply: 0,

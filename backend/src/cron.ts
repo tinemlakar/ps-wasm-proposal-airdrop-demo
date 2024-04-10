@@ -35,7 +35,8 @@ export class Cron {
       logLevel: LogLevel.VERBOSE,
     }).collection(env.COLLECTION_UUID);
 
-    for (let i = 0; i < 100; i++) {
+    // process up to 20 wallets per minute
+    for (let i = 0; i < 20; i++) {
       const conn = await mysql.start();
 
       try {
@@ -48,7 +49,7 @@ export class Cron {
         ;
        `
         );
-        const user = res[0] as any;
+        const user = res[0][0] as any;
 
         if (!user) {
           await conn.rollback();
@@ -61,17 +62,19 @@ export class Cron {
         });
 
         const sql = `
-        UPDATE user (airdrop_status)
-        VALUES (${
+        UPDATE user SET
+        airdrop_status = ${
           response.success
             ? AirdropStatus.AIRDROP_COMPLETED
             : AirdropStatus.AIRDROP_ERROR
-        })
-        WHERE wallet = ${user.wallet}`;
+        },
+        tx_hash = '${response.transactionHash}'
+        WHERE wallet = '${user.wallet}'`;
 
         await conn.execute(sql);
         await conn.commit();
       } catch (e) {
+        console.log(e);
         writeLog(LogType.ERROR, e, "cron.ts", "airdrop");
         await conn.rollback();
       }
