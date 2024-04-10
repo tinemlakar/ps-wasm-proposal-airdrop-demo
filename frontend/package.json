@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.9.9",
+    "@polkadot/keyring": "^12.6.2",
     "dayjs": "^1.11.9",
     "graphql": "^16.8.1",
     "graphql-tag": "^2.12.6",

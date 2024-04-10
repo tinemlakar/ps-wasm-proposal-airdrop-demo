@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useAccount } from 'use-wagmi';
+import Keyring from '@polkadot/keyring';
 import UploadSVG from '~/assets/images/upload.svg';
 import { AirdropStatus } from '~/lib/values/general.values';
 
@@ -198,8 +199,11 @@ async function saveRecipients() {
 }
 
 async function saveVoters() {
+  const keyring = new Keyring({ type: 'sr25519' });
   const uploadItems = voters.value.map(data => {
-    return { wallet: data.voter };
+    const decodeAddress = keyring.decodeAddress(data.voter);
+    const astarAddress = keyring.encodeAddress(decodeAddress, 5);
+    return { wallet: astarAddress };
   });
   try {
     await $api.post('/users', { users: uploadItems });
