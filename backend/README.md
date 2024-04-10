@@ -1,1 +1,1 @@
-# Prebuild solution for wasm nft airdrop (backend)
+# Pre-built solution for wasm nft airdrop (backend)
