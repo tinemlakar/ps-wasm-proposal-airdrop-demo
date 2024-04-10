@@ -40,7 +40,7 @@ export class Cron {
       const conn = await mysql.start();
 
       try {
-        const res = await conn.execute(
+        const res = await mysql.paramExecute(
           `SELECT * FROM user WHERE
           airdrop_status = ${AirdropStatus.PENDING}
           AND status = ${SqlModelStatus.ACTIVE}
@@ -48,8 +48,10 @@ export class Cron {
           FOR UPDATE SKIP LOCKED
         ;
        `,
+          {},
+          conn,
         );
-        const user = res[0][0] as any;
+        const user = res[0] as any;
 
         if (!user) {
           await conn.rollback();
@@ -71,7 +73,7 @@ export class Cron {
         tx_hash = '${response.transactionHash}'
         WHERE wallet = '${user.wallet}'`;
 
-        await conn.execute(sql);
+        await mysql.paramExecute(sql, {}, conn);
         await conn.commit();
       } catch (e) {
         console.log(e);
