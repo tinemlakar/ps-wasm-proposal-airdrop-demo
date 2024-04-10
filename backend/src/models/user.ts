@@ -35,10 +35,10 @@ export class User extends BaseSqlModel {
         resolver: presenceValidator(),
         code: ValidatorErrorCode.PROFILE_WALLET_NOT_PRESENT,
       },
-      {
-        resolver: uniqueFieldValue("user", "wallet"),
-        code: ValidatorErrorCode.PROFILE_WALLET_ALREADY_TAKEN,
-      },
+      // {
+      //   resolver: uniqueFieldValue("user", "wallet"),
+      //   code: ValidatorErrorCode.PROFILE_WALLET_ALREADY_TAKEN,
+      // },
     ],
     populatable: [PopulateStrategy.DB, PopulateStrategy.ADMIN],
     serializable: [
