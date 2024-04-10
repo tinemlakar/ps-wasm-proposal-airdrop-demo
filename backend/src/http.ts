@@ -15,6 +15,7 @@ import { inject as injectCreateUser } from "./routes/create-user";
 import { inject as injectGetUser } from "./routes/get-user";
 import { inject as injectGetStatistics } from "./routes/get-statistics";
 import { inject as injectAdminLogin } from "./routes/admin-login";
+import { inject as injectConfirmUser } from "./routes/confirm-user";
 
 export interface Request extends express.Request {
   context: Context;
@@ -73,6 +74,7 @@ export class HttpServer {
     injectGetStatistics(this.app);
     injectGetUser(this.app);
     injectAdminLogin(this.app);
+    injectConfirmUser(this.app);
 
     // ERROR HANDLER
     injectErrors(this.app);
