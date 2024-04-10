@@ -1,16 +1,16 @@
-import { presenceValidator } from "@rawmodel/validators";
+import { presenceValidator } from '@rawmodel/validators';
 import {
   PopulateStrategy,
   SerializedStrategy,
   SystemErrorCode,
   ValidatorErrorCode,
-} from "../config/values";
-import { enumInclusionValidator, uniqueFieldValue } from "../lib/validators";
-import { BaseSqlModel, prop } from "./base-sql-model";
-import { integerParser, stringParser } from "@rawmodel/parsers";
-import { Context } from "../context";
-import { SqlError } from "../lib/errors";
-import { getQueryParams, selectAndCountQuery } from "../lib/sql-utils";
+} from '../config/values';
+import { enumInclusionValidator, uniqueFieldValue } from '../lib/validators';
+import { BaseSqlModel, prop } from './base-sql-model';
+import { integerParser, stringParser } from '@rawmodel/parsers';
+import { Context } from '../context';
+import { SqlError } from '../lib/errors';
+import { getQueryParams, selectAndCountQuery } from '../lib/sql-utils';
 
 export enum AirdropStatus {
   UNCONFIRMED = 1,
@@ -23,7 +23,7 @@ export class User extends BaseSqlModel {
   /**
    * wallet
    */
-  protected _tableName = "user";
+  protected _tableName = 'user';
 
   /**
    * wallet
@@ -103,7 +103,7 @@ export class User extends BaseSqlModel {
         err,
         this.getContext(),
         SystemErrorCode.DATABASE_ERROR,
-        "user/create"
+        'user/create',
       );
     }
   }
@@ -116,7 +116,7 @@ export class User extends BaseSqlModel {
         `UPDATE user SET airdrop_status = ${AirdropStatus.PENDING} WHERE
           airdrop_status = ${AirdropStatus.UNCONFIRMED}
         ;
-       `
+       `,
       );
       await this.db().commit(conn);
     } catch (err) {
@@ -125,7 +125,7 @@ export class User extends BaseSqlModel {
         err,
         this.getContext(),
         SystemErrorCode.DATABASE_ERROR,
-        "user/confirm"
+        'user/confirm',
       );
     }
   }
@@ -136,7 +136,7 @@ export class User extends BaseSqlModel {
       SELECT * FROM ${this._tableName}
       WHERE wallet = @wallet
     `,
-      { wallet }
+      { wallet },
     );
 
     if (data && data.length) {
@@ -159,7 +159,7 @@ export class User extends BaseSqlModel {
         SUM(IF(airdrop_status = 3, 1, 0)) as airdropped,
         SUM(IF(airdrop_status = 4, 1, 0)) as threwError
     FROM user;
-    `
+    `,
     );
     if (data && data.length) {
       return data[0];
@@ -182,15 +182,15 @@ export class User extends BaseSqlModel {
 
     // map url query with sql fields
     const fieldMap = {
-      id: "u.id",
-      wallet: "u.wallet",
-      status: "u.status",
+      id: 'u.id',
+      wallet: 'u.wallet',
+      status: 'u.status',
     };
     const { params, filters } = getQueryParams(
       defaultParams,
-      "u",
+      'u',
       fieldMap,
-      urlQuery
+      urlQuery,
     );
     if (filters.limit === -1) {
       filters.limit = null;
@@ -217,13 +217,13 @@ export class User extends BaseSqlModel {
       qFilter: `
         ORDER BY ${
           filters.orderArr
-            ? `${filters.orderArr.join(", ") || "u.updateTime DESC"}`
-            : "u.updateTime DESC"
+            ? `${filters.orderArr.join(', ') || 'u.updateTime DESC'}`
+            : 'u.updateTime DESC'
         }
         ${
           filters.limit !== null
             ? `LIMIT ${filters.limit} OFFSET ${filters.offset}`
-            : ""
+            : ''
         };
       `,
     };
@@ -232,7 +232,7 @@ export class User extends BaseSqlModel {
       this.db(),
       sqlQuery,
       params,
-      "u.id"
+      'u.id',
     );
     const conn = await this.db().db.getConnection();
     try {
@@ -240,10 +240,10 @@ export class User extends BaseSqlModel {
         items.map(async (item) => {
           const u = new User({}, this.getContext()).populate(
             item,
-            PopulateStrategy.DB
+            PopulateStrategy.DB,
           );
           return u.serialize(serializedStrategy);
-        })
+        }),
       );
       return { items: populatedItems, total };
     } catch (e) {

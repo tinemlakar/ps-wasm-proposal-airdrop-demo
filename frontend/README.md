@@ -1,4 +1,4 @@
-# Wasm airdrop prebuild solution frontend
+# Wasm airdrop pre-built solution frontend
 
 This repository contains source code for wasm nft proposal Airdrop website.
 

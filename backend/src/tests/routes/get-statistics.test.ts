@@ -2,17 +2,17 @@ import {
   createContextAndStartServer,
   Stage,
   stopServerAndCloseMySqlContext,
-} from "../helpers/context";
-import request from "supertest";
-import { setupTestDatabase, clearTestDatabase } from "../helpers/migrations";
-import { AirdropStatus, User } from "../../models/user";
-import { env } from "../../config/env";
-import { generateAdminAuthToken } from "../../lib/jwt";
-import { getWallet } from "../helpers/wallets";
+} from '../helpers/context';
+import request from 'supertest';
+import { setupTestDatabase, clearTestDatabase } from '../helpers/migrations';
+import { AirdropStatus, User } from '../../models/user';
+import { env } from '../../config/env';
+import { generateAdminAuthToken } from '../../lib/jwt';
+import { getWallet } from '../helpers/wallets';
 let stage: Stage;
 let token;
 
-describe("get statistics", () => {
+describe('get statistics', () => {
   beforeAll(async () => {
     stage = await createContextAndStartServer();
     token = generateAdminAuthToken(env.ADMIN_WALLET[0]);
@@ -58,10 +58,10 @@ describe("get statistics", () => {
     await stopServerAndCloseMySqlContext(stage);
   });
 
-  test("gets statistics", async () => {
+  test('gets statistics', async () => {
     const res = await request(stage.app)
-      .get("/users/statistics")
-      .set("Authorization", `Bearer ${token}`);
+      .get('/users/statistics')
+      .set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(200);
     expect(res.body.data).toEqual({
       total: 5,

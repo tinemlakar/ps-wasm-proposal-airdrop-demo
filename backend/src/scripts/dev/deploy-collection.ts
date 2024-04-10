@@ -4,8 +4,8 @@ import {
   LogLevel,
   Nft,
   SubstrateChain,
-} from "@apillon/sdk";
-import { env } from "../../config/env";
+} from '@apillon/sdk';
+import { env } from '../../config/env';
 
 (async () => {
   const nft = new Nft({
@@ -17,13 +17,13 @@ import { env } from "../../config/env";
   const collection = await nft.createSubstrate({
     chain: SubstrateChain.ASTAR,
     collectionType: CollectionType.GENERIC,
-    name: "Drop test",
-    description: "Specific ID drop test",
-    symbol: "DT",
+    name: 'Drop test',
+    description: 'Specific ID drop test',
+    symbol: 'DT',
     royaltiesFees: 0,
-    royaltiesAddress: "WfuyB8znWybwbkrXu5a6e4CdPPwRygyoqzByAZHBZuCgQdn",
-    baseUri: "https://test.com/metadata/",
-    baseExtension: ".json",
+    royaltiesAddress: 'WfuyB8znWybwbkrXu5a6e4CdPPwRygyoqzByAZHBZuCgQdn',
+    baseUri: 'https://test.com/metadata/',
+    baseExtension: '.json',
     maxSupply: 0,
     drop: false,
   });

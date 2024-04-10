@@ -1,16 +1,16 @@
-import { CronJob } from "cron";
-import { AirdropStatus } from "./models/user";
-import { SqlModelStatus } from "./models/base-sql-model";
-import { MysqlConnectionManager } from "./lib/mysql-connection-manager";
-import { env } from "./config/env";
-import { LogType, writeLog } from "./lib/logger";
-import { LogLevel, Nft } from "@apillon/sdk";
+import { CronJob } from 'cron';
+import { AirdropStatus } from './models/user';
+import { SqlModelStatus } from './models/base-sql-model';
+import { MysqlConnectionManager } from './lib/mysql-connection-manager';
+import { env } from './config/env';
+import { LogType, writeLog } from './lib/logger';
+import { LogLevel, Nft } from '@apillon/sdk';
 
 export class Cron {
   private cronJobs: CronJob[] = [];
 
   constructor() {
-    this.cronJobs.push(new CronJob("* * * * *", this.airdrop, null, false));
+    this.cronJobs.push(new CronJob('* * * * *', this.airdrop, null, false));
   }
 
   async start() {
@@ -47,7 +47,7 @@ export class Cron {
           LIMIT 1
           FOR UPDATE SKIP LOCKED
         ;
-       `
+       `,
         );
         const user = res[0][0] as any;
 
@@ -75,7 +75,7 @@ export class Cron {
         await conn.commit();
       } catch (e) {
         console.log(e);
-        writeLog(LogType.ERROR, e, "cron.ts", "airdrop");
+        writeLog(LogType.ERROR, e, 'cron.ts', 'airdrop');
         await conn.rollback();
       }
     }
