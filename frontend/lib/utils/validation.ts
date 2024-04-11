@@ -35,6 +35,7 @@ export function validateRequiredDropdown(_: FormItemRule, value: String | null):
 export function validateEvmAddress(_: FormItemRule, value: string | null): boolean {
   return !!value && /^0x[a-fA-F0-9]{40}$/i.test(value);
 }
+
 export function validateNaturalNumber(_: FormItemRule, value: number | string | null): boolean {
   return value !== null && intVal(value) >= 0;
 }

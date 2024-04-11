@@ -26,11 +26,8 @@ export enum PaginationValues {
 }
 
 export enum AirdropStatus {
-  PENDING = 1,
-  EMAIL_SENT = 2,
-  EMAIL_ERROR = 3,
-  WALLET_LINKED = 4,
-  TRANSACTION_CREATED = 5,
-  AIRDROP_COMPLETED = 6,
-  AIRDROP_ERROR = 7,
+  UNCONFIRMED = 1,
+  PENDING = 2,
+  AIRDROP_COMPLETED = 3,
+  AIRDROP_ERROR = 4,
 }

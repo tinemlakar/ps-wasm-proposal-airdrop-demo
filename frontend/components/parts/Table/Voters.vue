@@ -3,17 +3,23 @@
     :bordered="false"
     :columns="columns"
     :data="voters"
-    :pagination="{ pageSize: PaginationValues.PAGE_DEFAULT_LIMIT }"
+    :pagination="{ pageSize: 10 }"
   />
+  <Btn @click="saveVoters()">Save voters</Btn>
 </template>
 
 <script lang="ts" setup>
 import type { DataTableColumns } from 'naive-ui';
-import { PaginationValues } from '~/lib/values/general.values';
+import { encodeAstarAddress } from '~/lib/misc/crypto';
 
 defineProps({
   voters: { type: Array<VoterInterface>, required: true },
 });
+const emit = defineEmits(['onSave']);
+
+const message = useMessage();
+const userStore = useUserStore();
+const { handleError } = useErrors();
 
 const createColumns = (): DataTableColumns<VoterInterface> => {
   return [
@@ -34,4 +40,18 @@ const createColumns = (): DataTableColumns<VoterInterface> => {
   ];
 };
 const columns = createColumns();
+
+async function saveVoters() {
+  const uploadItems = userStore.voters.map(data => {
+    return { wallet: encodeAstarAddress(data.voter) };
+  });
+  try {
+    await $api.post('/users', { users: uploadItems });
+
+    message.success('Recipients are successfully added.');
+    emit('onSave');
+  } catch (e) {
+    handleError(e);
+  }
+}
 </script>

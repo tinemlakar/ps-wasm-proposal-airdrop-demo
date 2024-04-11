@@ -332,6 +332,15 @@ body > .n-message-container {
   }
 }
 
+/** Select menu */
+.n-select-menu {
+  margin: 0;
+
+  .v-vl-visible-items {
+    padding: 16px 12px;
+  }
+}
+
 /** Tag */
 .n-tag {
   @apply uppercase font-bold;

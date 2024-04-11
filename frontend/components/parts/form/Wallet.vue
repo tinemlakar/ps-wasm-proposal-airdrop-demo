@@ -2,7 +2,11 @@
 import WalletSVG from '~/assets/images/wallet.svg';
 import { useConnect } from 'use-wagmi';
 
-const { connect, connectors, pendingConnector } = useConnect();
+defineProps({
+  loading: { type: Boolean, default: false },
+});
+
+const { connect, isLoading, connectors, pendingConnector } = useConnect();
 </script>
 
 <template>
@@ -16,14 +20,13 @@ const { connect, connectors, pendingConnector } = useConnect();
         crucial for securely receiving and managing the airdropped NFTs.
       </p>
     </div>
-
     <n-space size="large" vertical>
       <Btn
         v-for="(connector, key) in connectors"
         :key="key"
         type="secondary"
         size="large"
-        :loading="connector.id === pendingConnector?.id"
+        :loading="(loading || isLoading) && connector.id === pendingConnector?.id"
         :disabled="!connector.ready"
         @click="connect({ connector })"
       >

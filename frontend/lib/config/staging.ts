@@ -1,4 +1,4 @@
-import { ConfigInterface } from '~/lib/types/general.types';
+import type { ConfigInterface } from '~/lib/types/general.types';
 
 const config: ConfigInterface = {
   APP_URL: 'https://app-stg.apillon.io',

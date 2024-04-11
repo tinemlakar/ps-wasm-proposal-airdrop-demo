@@ -8,13 +8,16 @@
 </template>
 
 <script lang="ts" setup>
-import type { DataTableColumns } from 'naive-ui';
+import { NInput, type DataTableColumns } from 'naive-ui';
+import { encodeAstarAddress, substrateAddressValidate } from '~/lib/misc/crypto';
+import { SubstrateChainPrefix } from '~/lib/types/general.types';
 import { AirdropStatus, PaginationValues } from '~/lib/values/general.values';
 
 const props = defineProps({
   users: { type: Array<UserInterface>, required: true },
 });
 const emit = defineEmits(['addUser', 'removeUser']);
+const message = useMessage();
 
 const newUser = ref<UserInterface>({
   airdrop_status: AirdropStatus.PENDING,
@@ -22,7 +25,7 @@ const newUser = ref<UserInterface>({
 });
 
 function isEditable(row: UserInterface, index: number) {
-  return !row.wallet && props.users.length === index + 1;
+  return !row.wallet && props.users.length % PaginationValues.PAGE_DEFAULT_LIMIT === index + 1;
 }
 
 const createColumns = (): DataTableColumns<UserInterface> => {
@@ -31,8 +34,18 @@ const createColumns = (): DataTableColumns<UserInterface> => {
       key: 'wallet',
       title: 'Wallet',
       minWidth: 100,
-      render(row: UserInterface) {
-        return h(resolveComponent('TableEllipsis'), { text: row.wallet }, '');
+      render(row: UserInterface, index: number) {
+        if (isEditable(row, index)) {
+          return h(NInput, {
+            value: newUser.value.wallet,
+            type: 'wallet',
+            onUpdateValue(v: any) {
+              newUser.value.wallet = `${v}`;
+            },
+          });
+        } else {
+          return h(resolveComponent('TableEllipsis'), { text: row.wallet }, '');
+        }
       },
     },
     {
@@ -76,11 +89,29 @@ const createColumns = (): DataTableColumns<UserInterface> => {
 };
 const columns = createColumns();
 
-function addItem(user: UserInterface) {
-  user.wallet = newUser.value.wallet;
-  newUser.value.wallet = '';
+function userAlreadyExists(address: string) {
+  return props.users.some(item => item.wallet === address);
+}
 
-  emit('addUser', newUser.value);
+function addItem(user: UserInterface) {
+  if (!newUser.value.wallet) {
+    message.warning('Please add Polkadot wallet address');
+  } else if (
+    !substrateAddressValidate(newUser.value.wallet) &&
+    !substrateAddressValidate(newUser.value.wallet, SubstrateChainPrefix.SUBSTRATE)
+  ) {
+    message.warning('Please provide a valid Polkadot wallet address');
+  } else {
+    const encodedWallet = encodeAstarAddress(newUser.value.wallet);
+    if (userAlreadyExists(encodedWallet)) {
+      message.warning('Please add different wallet address');
+      return;
+    }
+    user.wallet = encodeAstarAddress(newUser.value.wallet);
+    newUser.value.wallet = '';
+
+    emit('addUser', newUser.value);
+  }
 }
 
 function removeItem(user: UserInterface) {

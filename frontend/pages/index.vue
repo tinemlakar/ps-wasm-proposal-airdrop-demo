@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { useAccount } from 'use-wagmi';
-import Keyring from '@polkadot/keyring';
 import UploadSVG from '~/assets/images/upload.svg';
+import { encodeAstarAddress, substrateAddressValidate } from '~/lib/misc/crypto';
+import { SubstrateChainPrefix } from '~/lib/types/general.types';
 import { AirdropStatus } from '~/lib/values/general.values';
 
 useHead({
-  title: 'Apillon email airdrop prebuilt solution',
+  title: 'Apillon Wasm proposal airdrop prebuilt solution',
 });
 
 const message = useMessage();
@@ -13,28 +14,9 @@ const userStore = useUserStore();
 const { isConnected } = useAccount();
 const { handleError } = useErrors();
 
-let recipientInterval: any = null;
 const items = ref<UserInterface[]>([]);
-const voters = ref<VoterInterface[]>([]);
 const statistics = ref<StatisticsInterface | null>(null);
 const modalUploadCsvVisible = ref<boolean>(false);
-const proposalIndex = ref<number | null>(null);
-const proposalDecision = [
-  {
-    label: 'Yes',
-    key: 'yes',
-  },
-  {
-    label: 'No',
-    key: 'no',
-  },
-  {
-    label: 'Abstain',
-    key: 'abstain',
-  },
-];
-
-let selectedDecision = 'yes';
 
 const isLoggedIn = computed(() => isConnected.value && userStore.jwt);
 const selectedRecipients = computed(() => items.value.length);
@@ -44,10 +26,6 @@ onMounted(async () => {
     await getUsers();
     await getStatistics();
   }
-});
-
-onUnmounted(() => {
-  clearInterval(recipientInterval);
 });
 
 watch(
@@ -60,21 +38,14 @@ watch(
   }
 );
 
-function handleSelect(key: string) {
-  selectedDecision = String(key);
-}
-
 function onFileUploaded(csvData: CsvItem[]) {
   modalUploadCsvVisible.value = false;
 
   const data: UserInterface[] = csvData.map(item => {
     return {
       airdrop_status: AirdropStatus.PENDING,
-      email: item.email,
-      email_sent_time: null,
-      email_start_send_time: item.email_start_send_time,
-      nft_id: item.nft_id,
-      wallet: null,
+      tx_hash: null,
+      wallet: item.wallet,
     } as UserInterface;
   });
 
@@ -82,17 +53,28 @@ function onFileUploaded(csvData: CsvItem[]) {
     items.value = data;
   } else {
     data.forEach(item => {
-      if (emailAlreadyExists(item.email)) {
-        message.warning(`Email: ${item.email} is already on the list`);
+      if (!item.wallet) {
+        message.warning('Please add Polkadot wallet address');
+      } else if (
+        !substrateAddressValidate(item.wallet) &&
+        !substrateAddressValidate(item.wallet, SubstrateChainPrefix.SUBSTRATE)
+      ) {
+        message.warning('Please provide a valid Polkadot wallet address');
       } else {
-        items.value.unshift(item as UserInterface);
+        const encodedWallet = encodeAstarAddress(item.wallet);
+        if (walletAlreadyExists(encodedWallet)) {
+          message.warning(`Wallet: ${item.wallet} is already on the list`);
+        } else {
+          item.wallet = encodedWallet;
+          items.value.unshift(item as UserInterface);
+        }
       }
     });
   }
 }
 
-function emailAlreadyExists(email: string) {
-  return items.value.some(item => item.email === email);
+function walletAlreadyExists(wallet: string) {
+  return items.value.some(item => item.wallet === wallet);
 }
 
 async function getUsers() {
@@ -102,14 +84,10 @@ async function getUsers() {
       items.value = res.data.items;
     } else {
       res.data.items.forEach(item => {
-        const recipient = items.value.find(r => r.email === item.email);
+        const recipient = items.value.find(r => r.wallet === item.wallet);
         if (recipient) {
           recipient.airdrop_status = item.airdrop_status;
           recipient.id = item.id;
-          recipient.email = item.email;
-          recipient.email_sent_time = item.email_sent_time;
-          recipient.email_start_send_time = item.email_start_send_time;
-          recipient.nft_id = item.nft_id;
           recipient.tx_hash = item.tx_hash;
           recipient.wallet = item.wallet;
         } else {
@@ -117,9 +95,6 @@ async function getUsers() {
         }
       });
     }
-
-    /** Users pooling */
-    checkUnfinishedRecipients();
   } catch (e) {
     handleError(e);
   }
@@ -131,45 +106,28 @@ async function getStatistics() {
 }
 
 function addRecipient() {
-  items.value.push({
-    airdrop_status: AirdropStatus.PENDING,
-    email: '',
-    email_sent_time: null,
-    email_start_send_time: null,
-    nft_id: null,
-    wallet: null,
-  });
-}
-
-async function getVoters() {
-  // , decision: string
-  if (proposalIndex.value) {
-    const query = gql`
-      query getVoters($proposal: Int!, $decision: VoteDecision!) {
-        flattenedConvictionVotes(
-          where: { proposalIndex_eq: $proposal, removedAt_isNull: true, decision_eq: $decision }
-          orderBy: parentVote_createdAt_ASC
-        ) {
-          balance {
-            ... on StandardVoteBalance {
-              value
-            }
-          }
-          decision
-          lockPeriod
-          voter
-          removedAt
-        }
-      }
-    `;
-    const variables = { proposal: proposalIndex.value, decision: selectedDecision };
-    const { data }: any = await useAsyncQuery(query, variables);
-    voters.value = data.value.flattenedConvictionVotes;
+  if (!items.value.some(item => item.wallet === null)) {
+    items.value.push({
+      airdrop_status: AirdropStatus.PENDING,
+      tx_hash: null,
+      wallet: null,
+    });
   }
 }
 
-function onUserRemove(email: string) {
-  items.value = items.value.filter(item => item.email !== email);
+async function checkRecipients() {
+  try {
+    await $api.post('/users/confirm');
+    await getUsers();
+
+    message.success('Recipient statuses are updated');
+  } catch (e) {
+    handleError(e);
+  }
+}
+
+function onUserRemove(wallet: string) {
+  items.value = items.value.filter(item => item.wallet !== wallet);
 }
 function onUserAdded(user: UserInterface) {
   items.value.push(JSON.parse(JSON.stringify(user)));
@@ -177,7 +135,7 @@ function onUserAdded(user: UserInterface) {
 }
 
 async function saveRecipients() {
-  const uploadItems = items.value.filter(item => !item.id && item.email);
+  const uploadItems = items.value.filter(item => !item.id && item.wallet);
 
   if (!userStore.jwt) {
     message.warning('Please login first to proceed with this action');
@@ -198,59 +156,30 @@ async function saveRecipients() {
   }
 }
 
-async function saveVoters() {
-  const keyring = new Keyring({ type: 'sr25519' });
-  const uploadItems = voters.value.map(data => {
-    const decodeAddress = keyring.decodeAddress(data.voter);
-    const astarAddress = keyring.encodeAddress(decodeAddress, 5);
-    return { wallet: astarAddress };
-  });
-  try {
-    await $api.post('/users', { users: uploadItems });
-    await getUsers();
-    await getStatistics();
-
-    message.success('Recipients are successfully added.');
-  } catch (e) {
-    handleError(e);
-  }
-}
-
-/** Recipients polling */
-function checkUnfinishedRecipients() {
-  const unfinishedRecipient = items.value.find(
-    item => item.airdrop_status === AirdropStatus.PENDING
-  );
-  if (unfinishedRecipient === undefined) {
-    return;
-  }
-
-  clearInterval(recipientInterval);
-  recipientInterval = setInterval(async () => {
-    await getUsers();
-    const recipient = items.value.find(item => item.airdrop_status === AirdropStatus.PENDING);
-    if (!recipient || recipient.airdrop_status >= AirdropStatus.EMAIL_SENT) {
-      clearInterval(recipientInterval);
-    }
-  }, 10000);
+async function onVotersSaved() {
+  await getUsers();
+  await getStatistics();
 }
 </script>
 
 <template>
   <div>
-    <div class="w-full my-12 mx-auto">
-      Proposal index:
-      <n-input-number v-model:value="proposalIndex"> </n-input-number>
-      <n-dropdown trigger="click" :options="proposalDecision" @select="handleSelect"
-        ><Btn>{{ selectedDecision }}</Btn></n-dropdown
-      >
-      <Btn @click="getVoters()">Fetch voters</Btn>
-      <Btn @click="saveVoters()">Save voters</Btn>
+    <div class="w-full mt-8 mb-12 mx-auto">
+      <div class="max-w-xl mx-auto">
+        <FormVoters />
+        <TableVoters
+          v-if="userStore.voters?.length"
+          :voters="userStore.voters"
+          @on-save="onVotersSaved"
+        />
+      </div>
 
-      <TableVoters v-if="voters" :voters="voters" />
       <h3 class="my-8">NFT Recipients</h3>
 
-      <Statistics v-if="statistics" :statistics="statistics" />
+      <n-space class="pb-8" size="large" justify="space-between" align="end">
+        <Statistics v-if="statistics" :statistics="statistics" />
+        <Btn class="float-right" type="secondary" @click="checkRecipients"> Check recipients </Btn>
+      </n-space>
       <TableUsers v-if="items" :users="items" @add-user="onUserAdded" @remove-user="onUserRemove" />
 
       <n-space class="w-full my-8" size="large" align="center" justify="space-between">

@@ -65,10 +65,12 @@ export const ErrorCodes = {
   400005: 'Missing signature',
   400006: 'Token does not exists',
   400007: 'NFT already claimed',
+  400009: 'Wrong wallet, please try another one',
+  403001: 'You need to connect your wallet',
 
   // SystemErrorCode
   500000: 'DEFAULT_SYSTEM_ERROR',
-  500001: 'There was an error with your request. Please try again later.',
+  500001: 'Voters already exists in table.',
   500002: 'SQL_SYSTEM_ERROR',
   500003: 'VECTOR_DB_SYSTEM_ERROR',
   500004: 'EMAIL_SYSTEM_ERROR',

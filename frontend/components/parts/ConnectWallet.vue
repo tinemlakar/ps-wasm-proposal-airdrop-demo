@@ -35,7 +35,7 @@
     @close="() => (modalWalletVisible = false)"
     @update:show="modalWalletVisible = false"
   >
-    <FormWallet />
+    <FormWallet :loading="loading" />
   </modal>
 </template>
 
@@ -57,11 +57,7 @@ const { error } = useMessage();
 const userStore = useUserStore();
 const { handleError } = useErrors();
 
-const { connect, connectors, isLoading } = useConnect({
-  onSuccess: () => {
-    console.log('success');
-  },
-});
+const { connect, connectors, isLoading } = useConnect();
 const { data: walletClient, refetch } = useWalletClient();
 const { address, isConnected } = useAccount({ onConnect: loginDelay });
 const { disconnect } = useDisconnect();
@@ -119,8 +115,10 @@ async function login() {
     modalWalletVisible.value = false;
   } catch (e) {
     handleError(e);
+    disconnectWallet();
+  } finally {
+    loading.value = false;
   }
-  loading.value = false;
 }
 
 function loginDelay() {

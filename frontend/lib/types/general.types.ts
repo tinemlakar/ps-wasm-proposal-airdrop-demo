@@ -4,25 +4,11 @@ export interface ConfigInterface {
   PROPOSAL_GQL_URL: string;
 }
 
-export type AuthResponseProfile = {
-  id: number;
-  authUser: {
-    id: number;
-    status: number;
-    username: string;
-    email?: string;
-    roles: any[];
-    permissions: any[];
-  };
-};
-
-export type AuthResponse = {
-  profile: AuthResponseProfile;
-  authToken: {
-    status: boolean;
-    data: string;
-  };
-};
+export enum SubstrateChainPrefix {
+  POLKADOT = 0,
+  ASTAR = 5,
+  SUBSTRATE = 42,
+}
 
 declare global {
   type CsvItem = {
@@ -85,12 +71,11 @@ declare global {
   type UsersResponse = GeneralItemsResponse<UserInterface>;
 
   interface StatisticsInterface {
-    airdropped: number;
-    emailSent: number;
-    pending: number;
-    threwError: number;
-    total: number;
-    walletLinked: number;
+    airdropped: number | null;
+    pending: number | null;
+    threwError: number | null;
+    total: number | null;
+    unconfirmed: number | null;
   }
 
   type StatisticsResponse = GeneralResponse<StatisticsInterface>;
