@@ -8,12 +8,15 @@
     "development:run": "node -r ts-node/register --inspect ./src/scripts/start-http",
     "cron": "node -r ts-node/register --inspect ./src/scripts/start-cron",
     "dev": "npm run development:run",
+    "build": "tsc",
     "tsc": "tsc",
     "dev:deploy-collection": "node -r ts-node/register ./src/scripts/dev/deploy-collection",
+    "db-upgrade:ci": "node -r ts-node/register ./src/scripts/db/upgrade-db --F",
     "db-upgrade": "node -r ts-node/register ./src/scripts/db/upgrade-db",
     "db-downgrade": "node -r ts-node/register ./src/scripts/db/downgrade-db",
     "db-rebuild": "node -r ts-node/register ./src/scripts/db/rebuild-db",
-    "db-drop": "node -r ts-node/register ./src/scripts/db/drop-db"
+    "db-drop": "node -r ts-node/register ./src/scripts/db/drop-db",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "dependencies": {
     "@apillon/sdk": "3.0.0",
@@ -36,7 +39,7 @@
     "ts-node": "^10.9.1"
   },
   "devDependencies": {
-    "@polkadot/api": "^10.12.6",
+    "@polkadot/keyring": "^12.6.2",
     "@polkadot/util-crypto": "^12.6.2",
     "@types/cron": "^2.4.0",
     "@types/express": "^4.17.21",

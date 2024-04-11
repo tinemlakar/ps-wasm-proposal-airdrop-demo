@@ -1,4 +1,4 @@
-# Apillon pre-built solution for WASM proposal airdrop
+# Apillon pre-built solution for WASM airdrop to proposal voters
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/Apillon?style=social)](https://twitter.com/intent/follow?screen_name=Apillon)
 

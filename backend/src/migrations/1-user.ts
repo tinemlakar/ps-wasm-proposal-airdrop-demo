@@ -1,5 +1,5 @@
 export async function upgrade(
-  queryFn: (query: string, values?: any[]) => Promise<Array<any>>
+  queryFn: (query: string, values?: any[]) => Promise<Array<any>>,
 ) {
   await queryFn(`
     CREATE TABLE IF NOT EXISTS \`user\` (
@@ -18,7 +18,7 @@ export async function upgrade(
   `);
 }
 export async function downgrade(
-  queryFn: (query: string, values?: any[]) => Promise<Array<any>>
+  queryFn: (query: string, values?: any[]) => Promise<Array<any>>,
 ) {
   await queryFn(`
     DROP TABLE IF EXISTS \`user\` ;

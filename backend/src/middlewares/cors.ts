@@ -1,5 +1,5 @@
-import * as cors from 'cors';
-import { Application, RequestHandler } from 'express';
+import cors from "cors";
+import { Application, RequestHandler } from "express";
 
 /**
  * Applies CORS middleware to application.

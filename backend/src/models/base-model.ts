@@ -1,15 +1,15 @@
-import { Model, ModelConfig, prop } from "@rawmodel/core";
-import { Context } from "../context";
+import { Model, ModelConfig, prop } from '@rawmodel/core';
+import { Context } from '../context';
 // tslint:disable-next-line: no-import-side-effect
-import "reflect-metadata";
-import { SerializedStrategy } from "../config/values";
-import { PoolConnection } from "mysql2/promise";
+import 'reflect-metadata';
+import { SerializedStrategy } from '../config/values';
+import { PoolConnection } from 'mysql2/promise';
 
 /**
  * Common model related objects.
  */
 export { prop };
-const fieldNameMetadataKey = Symbol("fieldName");
+const fieldNameMetadataKey = Symbol('fieldName');
 export function fieldName(name: string): any {
   return Reflect.metadata(fieldNameMetadataKey, name);
 }
@@ -24,7 +24,7 @@ export function getFieldName(target: any, propertyKey: string) {
 export abstract class BaseModel extends Model<Context> {
   public _fieldNames = {};
 
-  protected _tableName = "";
+  protected _tableName = '';
 
   /**
    * Class constructor.
@@ -47,11 +47,11 @@ export abstract class BaseModel extends Model<Context> {
       INSERT INTO \`${this._tableName}\`
       ( ${Object.keys(serializedModel)
         .map((x) => `\`${x}\``)
-        .join(", ")} )
+        .join(', ')} )
       VALUES (
         ${Object.keys(serializedModel)
           .map((key) => `@${key}`)
-          .join(", ")}
+          .join(', ')}
       )`;
 
       await this.db().paramExecute(createQuery, serializedModel, conn);
@@ -111,20 +111,25 @@ export abstract class BaseModel extends Model<Context> {
     if (!data) {
       return super.populate(mappedObj, strategy);
     }
-    for (const key of Object.keys(this.__props)) {
-      if (data.hasOwnProperty(key)) {
-        mappedObj[key] = data[key];
-      } else if (data.hasOwnProperty(getFieldName(this, key))) {
-        mappedObj[key] = data[getFieldName(this, key)];
+
+    if (data)
+      for (const key of Object.keys(this.__props)) {
+        if (!data.hasOwnProperty) {
+          data = JSON.stringify(data);
+        }
+        if (data.hasOwnProperty(key)) {
+          mappedObj[key] = data[key];
+        } else if (data.hasOwnProperty(getFieldName(this, key))) {
+          mappedObj[key] = data[getFieldName(this, key)];
+        }
       }
-    }
     return super.populate(mappedObj, strategy);
   }
 
   protected db() {
     let ctx = this.getContext();
-    if (ctx["context"]) {
-      ctx = ctx["context"];
+    if (ctx['context']) {
+      ctx = ctx['context'];
     }
     return ctx.mysql;
   }

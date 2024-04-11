@@ -1,5 +1,5 @@
-import * as bodyParser from 'body-parser';
-import { Application, RequestHandler } from 'express';
+import bodyParser from "body-parser";
+import { Application, RequestHandler } from "express";
 
 /**
  * Applies data parser middlewares to application.
@@ -13,5 +13,5 @@ export function inject(app: Application): void {
  * Returns JSON body parser middleware.
  */
 export function createJsonParser(): RequestHandler {
-  return bodyParser.json({ limit: '10mb' });
+  return bodyParser.json({ limit: "10mb" });
 }
