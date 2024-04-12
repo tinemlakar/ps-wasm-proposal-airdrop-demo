@@ -46,11 +46,11 @@ export abstract class BaseModel extends Model<Context> {
       const createQuery = `
       INSERT INTO \`${this._tableName}\`
       ( ${Object.keys(serializedModel)
-        .map((x) => `\`${x}\``)
+        .map(x => `\`${x}\``)
         .join(', ')} )
       VALUES (
         ${Object.keys(serializedModel)
-          .map((key) => `@${key}`)
+          .map(key => `@${key}`)
           .join(', ')}
       )`;
 
@@ -115,7 +115,7 @@ export abstract class BaseModel extends Model<Context> {
     if (data)
       for (const key of Object.keys(this.__props)) {
         if (!data.hasOwnProperty) {
-          data = JSON.stringify(data);
+          data = JSON.parse(JSON.stringify(data));
         }
         if (data.hasOwnProperty(key)) {
           mappedObj[key] = data[key];
