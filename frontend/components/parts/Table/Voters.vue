@@ -42,9 +42,12 @@ const createColumns = (): DataTableColumns<VoterInterface> => {
 const columns = createColumns();
 
 async function saveVoters() {
-  const uploadItems = userStore.voters.map(data => {
+  let uploadItems = userStore.voters.map(data => {
     return { wallet: encodeAstarAddress(data.voter) };
   });
+
+  const ids = uploadItems.map(({ wallet }) => wallet);
+  uploadItems = uploadItems.filter(({ wallet }, index) => !ids.includes(wallet, index + 1));
   try {
     await $api.post('/users', { users: uploadItems });
 
