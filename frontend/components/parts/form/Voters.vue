@@ -1,5 +1,11 @@
 <template>
-  <n-form ref="formRef" :model="formData" :rules="rules" @submit.prevent="handleSubmit">
+  <n-form
+    ref="formRef"
+    :model="formData"
+    :rules="rules"
+    size="small"
+    @submit.prevent="handleSubmit"
+  >
     <n-form-item
       path="proposalIndex"
       label="Proposal index"
@@ -31,7 +37,7 @@
     <!--  Form submit -->
     <n-form-item :show-label="false">
       <input type="submit" class="hidden" />
-      <Btn type="primary" class="w-full mt-2" :loading="loading" @click="handleSubmit">
+      <Btn type="primary" class="w-full mt-2" size="small" :loading="loading" @click="handleSubmit">
         Fetch voters
       </Btn>
     </n-form-item>

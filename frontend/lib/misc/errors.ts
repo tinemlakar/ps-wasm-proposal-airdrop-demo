@@ -70,7 +70,7 @@ export const ErrorCodes = {
 
   // SystemErrorCode
   500000: 'DEFAULT_SYSTEM_ERROR',
-  500001: 'Voters already exists in table.',
+  500001: 'There was an error with your request. Please try again later.',
   500002: 'SQL_SYSTEM_ERROR',
   500003: 'VECTOR_DB_SYSTEM_ERROR',
   500004: 'EMAIL_SYSTEM_ERROR',

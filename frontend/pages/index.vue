@@ -15,8 +15,9 @@ const { isConnected } = useAccount();
 const { handleError } = useErrors();
 
 const items = ref<UserInterface[]>([]);
-const statistics = ref<StatisticsInterface | null>(null);
+const statistics = ref<StatisticsInterface | undefined>();
 const modalUploadCsvVisible = ref<boolean>(false);
+const modalVotersVisible = ref<boolean>(false);
 
 const isLoggedIn = computed(() => isConnected.value && userStore.jwt);
 const selectedRecipients = computed(() => items.value.length);
@@ -115,12 +116,12 @@ function addRecipient() {
   }
 }
 
-async function checkRecipients() {
+async function startAirdrop() {
   try {
     await $api.post('/users/confirm');
     await getUsers();
 
-    message.success('Recipient statuses are updated');
+    message.success('Airdrop started');
   } catch (e) {
     handleError(e);
   }
@@ -159,26 +160,28 @@ async function saveRecipients() {
 async function onVotersSaved() {
   await getUsers();
   await getStatistics();
+  modalVotersVisible.value = false;
 }
 </script>
 
 <template>
   <div>
     <div class="w-full mt-8 mb-12 mx-auto">
-      <div class="max-w-xl mx-auto">
-        <FormVoters />
-        <TableVoters
-          v-if="userStore.voters?.length"
-          :voters="userStore.voters"
-          @on-save="onVotersSaved"
-        />
-      </div>
-
       <h3 class="my-8">NFT Recipients</h3>
 
-      <n-space class="pb-8" size="large" justify="space-between" align="end">
-        <Statistics v-if="statistics" :statistics="statistics" />
-        <Btn class="float-right" type="secondary" @click="checkRecipients"> Check recipients </Btn>
+      <n-space v-if="isLoggedIn" class="pb-8" size="large" justify="space-between" align="end">
+        <Statistics :statistics="statistics" />
+
+        <div class="inline-flex gap-4 float-right">
+          <Btn type="primary" @click="modalVotersVisible = !modalVotersVisible"> Add voters </Btn>
+
+          <n-popconfirm @positive-click="startAirdrop">
+            <template #trigger>
+              <Btn type="secondary">Start Airdrop</Btn>
+            </template>
+            Are you sure?
+          </n-popconfirm>
+        </div>
       </n-space>
       <TableUsers v-if="items" :users="items" @add-user="onUserAdded" @remove-user="onUserRemove" />
 
@@ -214,6 +217,21 @@ async function onVotersSaved() {
         </div>
         <FormUpload @close="modalUploadCsvVisible = false" @proceed="onFileUploaded" />
       </div>
+    </modal>
+
+    <modal
+      class="!max-w-2xl w-full !my-8"
+      :show="modalVotersVisible"
+      @close="() => (modalVotersVisible = false)"
+      @update:show="modalVotersVisible = false"
+    >
+      <FormVoters class="max-w-xs mx-auto" />
+      <TableVoters
+        v-if="userStore.voters?.length"
+        :voters="userStore.voters"
+        @on-save="onVotersSaved"
+      />
+      <div v-else class="min-h-[10rem]"></div>
     </modal>
   </div>
 </template>

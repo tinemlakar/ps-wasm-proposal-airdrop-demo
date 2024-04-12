@@ -284,6 +284,15 @@ body > .n-message-container {
       }
     }
   }
+
+  .n-data-table {
+    --n-merged-th-color: theme(colors.bg.DEFAULT);
+    --n-merged-td-color: theme(colors.bg.DEFAULT);
+    --n-merged-border-color: theme(colors.bg.lighter);
+    --n-merged-th-color-hover: theme(colors.bg.DEFAULT);
+    --n-merged-td-color-hover: theme(colors.bg.dark);
+    --n-merged-td-color-striped: theme(colors.bg.dark);
+  }
 }
 
 /** Pagination */
